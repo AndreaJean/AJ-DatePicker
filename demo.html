@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>日期插件</title>
+  <link rel="stylesheet" type="text/css" href="css/dataPicker.css">
+  <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_1586653_i7i0p90dw.css">
+</head>
+
+<body>
+  <div id='demo1'></div>
+  <div id='demo2'></div>
+  <div id='clear'>
+    <button id='disableBtn'>禁用</button>
+    <button id='ableBtn'>解禁</button>
+    <button id='getData'>getData</button>
+    <button id='setData'>setData</button>
+    <button id='addCheck'>addCheck</button>
+    <button id='removeCheck'>removeCheck</button>
+  </div>
+</body>
+
+</html>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/dataPicker.js"></script>
+<script type="text/javascript">
+let now = new Date()
+let setting = {
+  id: 'demo1',
+  preText: '单日历：',
+  preStyle: '',
+  startDate: '2021-12-09',
+  // startDate: now.getTime(),
+  endDate: now.getTime(),
+  isRange: false,
+  showMonth: false,
+  showHotkey: false,
+  showhhmmss: true,
+  callback: {
+    clearOver: function (data) {
+      console.log('clearOver', data)
+    },
+    selectOver: function (data) {
+      console.log('selectOver', data)
+    }, // 选中项改变
+    dataOver: function (data) {
+      console.log('dataOver', data)
+    },
+    setData: function (data) {
+      console.log('setData', data)
+    } // 调用$_setData后
+  }
+}
+let setting1 = {
+  id: 'demo2',
+  preText: '双日历：',
+  preStyle: '',
+  // startDate: now.getTime() - 3600 * 1000 * 24,
+  // endDate: now.getTime() + 3600 * 1000 * 24,
+  startDate: '2020-6-09',
+  endDate: '2024-3-11',
+  isRange: true,
+  showMonth: false,
+  showHotkey: false,
+  showhhmmss: true,
+  callback: {
+    clearOver: function (data) {
+      console.log('clearOver', data)
+    },
+    selectOver: function (data) {
+      console.log('selectOver', data)
+    }, // 选中项改变
+    dataOver: function (data) {
+      console.log('dataOver', data)
+    },
+    setData: function (data) {
+      console.log('setData', data)
+    } // 调用$_setData后
+  }
+}
+window.onload = function () {
+  let obj1 = new AjDataPicker(setting)
+  obj1.init()
+  let obj2 = new AjDataPicker(setting1)
+  obj2.init()
+  // $('#disableBtn').click(function () {
+  //   mySelect.$_disabled(true)
+  // })
+  // $('#getData').click(function () {
+  //   console.log(mySelect.$_getData())
+  // })
+  $('#setData').click(function () {
+    obj1.$_setData('2020-02-09 03:03:03,2020-11-11 01:01:01')
+    obj2.$_setData('2020-02-09 03:03:03,2020-11-11 01:01:01')
+  })
+  // $('#addCheck').click(function () {
+  //   // mySelect.$_addCheck(true, '错误提示', 'right')
+  //   mySelect.$_addCheck(true, '错误提示', 'bottom')
+  // })
+  // $('#removeCheck').click(function () {
+  //   mySelect.$_addCheck(false)
+  // })
+}
+</script>
+<style>
+html {
+  width: 100%;
+  height: 100%;
+}
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  /* padding:800px 20px 20px 20px; */
+  padding:100px 20px 20px 20px;
+}
+#demo1 {
+  position: relative;
+  float:left;
+  width: 400px;
+  height: 100px;
+  margin: 0px;
+  padding: 0px;
+  border:1px solid #c0c4cc;
+  font-size: 12px;;
+}
+#demo2 {
+  position: relative;
+  float:left;
+  clear:right;
+  width: 500px;
+  height: 100px;
+  margin: 0px;
+  padding: 0px;
+  border:1px solid #c0c4cc;
+  font-size: 12px;;
+}
+#clear {
+  clear:both;
+  padding: 20px 0;
+}
+#clear>button{
+  margin: 0 5px;
+  padding: 6px 12px;
+  border: 1px solid #b3d8ff;
+  border-radius: 4px;
+  background: #fff;
+  color: #2185d0;
+  cursor: pointer;
+  outline: none;
+  font-size: inherit;
+}
+</style>
