@@ -30,7 +30,7 @@ let setting = {
   id: 'demo1',
   preText: '单日历：',
   preStyle: '',
-  startDate: '2021-12-09',
+  // startDate: '2021-12-09',
   // startDate: now.getTime(),
   endDate: now.getTime(),
   isRange: false,
@@ -38,18 +38,12 @@ let setting = {
   showHotkey: false,
   showhhmmss: true,
   callback: {
-    clearOver: function (data) {
-      console.log('clearOver', data)
+    dataChange: function (data) {
+      console.log('dataChange', data)
     },
-    selectOver: function (data) {
-      console.log('selectOver', data)
-    }, // 选中项改变
-    dataOver: function (data) {
-      console.log('dataOver', data)
-    },
-    setData: function (data) {
-      console.log('setData', data)
-    } // 调用$_setData后
+    nodata: function (data) {
+      console.log('nodata', data)
+    } // 选中项改变
   }
 }
 let setting1 = {
@@ -58,25 +52,19 @@ let setting1 = {
   preStyle: '',
   // startDate: now.getTime() - 3600 * 1000 * 24,
   // endDate: now.getTime() + 3600 * 1000 * 24,
-  startDate: '2020-6-09',
-  endDate: '2024-3-11',
+  // startDate: '2020-6-09',
+  // endDate: '2024-3-11',
   isRange: true,
   showMonth: false,
   showHotkey: false,
   showhhmmss: true,
   callback: {
-    clearOver: function (data) {
-      console.log('clearOver', data)
+    dataChange: function (data) {
+      console.log('dataChange', data)
     },
-    selectOver: function (data) {
-      console.log('selectOver', data)
-    }, // 选中项改变
-    dataOver: function (data) {
-      console.log('dataOver', data)
-    },
-    setData: function (data) {
-      console.log('setData', data)
-    } // 调用$_setData后
+    nodata: function (data) {
+      console.log('nodata', data)
+    } // 选中项改变
   }
 }
 window.onload = function () {
@@ -84,14 +72,18 @@ window.onload = function () {
   obj1.init()
   let obj2 = new AjDataPicker(setting1)
   obj2.init()
-  // $('#disableBtn').click(function () {
-  //   mySelect.$_disabled(true)
-  // })
-  // $('#getData').click(function () {
-  //   console.log(mySelect.$_getData())
-  // })
+  $('#disableBtn').click(function () {
+    obj2.$_disabled(true)
+  })
+  $('#ableBtn').click(function () {
+    obj2.$_disabled(false)
+  })
+  $('#getData').click(function () {
+    console.log(obj1.$_getData())
+    console.log(obj2.$_getData())
+  })
   $('#setData').click(function () {
-    obj1.$_setData('2020-02-09 03:03:03,2020-11-11 01:01:01')
+    obj1.$_setData('2020-02-09 05:05:03,2020-11-11 01:01:01')
     obj2.$_setData('2020-02-09 03:03:03,2020-11-11 01:01:01')
   })
   // $('#addCheck').click(function () {

@@ -43,8 +43,7 @@ let AjDataPicker = function (options) {
         this.option.showHotkey = false
       }
       this.initValue()
-      // console.log(this.utils.formatTime(new Date(2020, 1), 'yyyy-MM-dd HH:mm:ss'))
-      // console.log('option', this.option)
+      console.log('option', this.option)
       this.box = $('#' + this.option.id)
       this.box.empty()
       this.createHeader()
@@ -54,7 +53,6 @@ let AjDataPicker = function (options) {
     // 初始化各种存储值
     initValue () {
       this.now = this.setTimeObj(new Date())
-      // console.log('now:', this.now)
       if (this.option.startDate) {
         this.initData.start = new Date(this.option.startDate)
         this._startDate = new Date(this.option.startDate)
@@ -64,15 +62,18 @@ let AjDataPicker = function (options) {
         this._endDate = new Date(this.option.endDate)
       }
     },
-    // 生成输入框
+    // 生成输入框============================================
     createHeader () {
-      let html = '<span class="vp-picker-pre-text">' + this.option.preText + '</span>' +
-                 '<div class="vp-picker-header' + (this.option.isRange ? ' is-range' : '') + '">' +
-                 '<i class="vp-picker-input-icon iconfont icon-rili"></i>' +
-                 '<input class="vp-picker-input start" placeholder="选择日期" readonly="readonly" unselectable="on" />'
+      let style = this.getStyle()
+      let html = (this.option.preText !== '' ? ('<span class="vp-picker-pre-text" style="' + this.option.preStyle + '">' + this.option.preText + '</span>') : '') +
+                 '<div class="vp-picker-container">' +
+                 '<div class="vp-picker-header' + (this.option.isRange ? ' is-range' : '') + '" style="' + style.input + '">' +
+                 '<i class="vp-picker-input-icon iconfont ' + (this.option.showhhmmss ? 'icon-tubiao_shijian2' : 'icon-rili') + '" style="' + style.rili + '"></i>' +
+                 '<input class="vp-picker-input start" placeholder="选择日期' + (this.option.showhhmmss ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
       html += this.option.isRange ? this.createEndTime() : ''
-      html += '<i class="vp-picker-input-icon clear iconfont"></i></div>'
+      html += '<i class="vp-picker-input-icon clear iconfont" style="' + style.clear + '"></i></div></div>'
       this.box.append(html)
+      this.container = this.box.find('.vp-picker-container')
       this.header = this.box.find('.vp-picker-header')
       this.input = {}
       this.input.start = this.box.find('.vp-picker-input.start')
@@ -84,19 +85,30 @@ let AjDataPicker = function (options) {
     // 日历补充结束时间html
     createEndTime () {
       let html = '<span class="vp-picker-range-separator">至</span>' +
-                 '<input class="vp-picker-input end" placeholder="选择日期" readonly="readonly" unselectable="on" />'
+                 '<input class="vp-picker-input end" placeholder="选择日期' + (this.option.showhhmmss ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
       return html
     },
     // 整理输入框自定义样式
     getStyle () {
-
+      let opt = this.option.inputStyle
+      let input = 'width:' + opt.width + ';' +
+                  'height:' + opt.height + ';' +
+                  'background-color:' + opt.bgColor + ';' +
+                  'border-radius:' + opt.borderRadius + ';' +
+                  'border-width:' + opt.borderwith + ';' +
+                  'border-color:' + opt.borderColor + ';'
+      let rili = 'color:' + opt.timerColor + ';' +
+                  'font-size:' + opt.timerSize + ';'
+      let clear = 'color:' + opt.clearColor + ';' +
+                  'font-size:' + opt.clearSize + ';'
+      return {input, rili, clear}
     },
     // 绑定header相关事件
     bindHeaderEvent () {
       let vm = this
       // Header鼠标滑入/滑出事件
       this.header.unbind('mouseover').bind('mouseover ', function (e) {
-        if (vm.input.start.val()) {
+        if (vm.input.start.val() || (vm.option.isRange && vm.input.end.val())) {
           vm.clearBtn.addClass('icon-shanchu2')
         }
       })
@@ -106,7 +118,6 @@ let AjDataPicker = function (options) {
       // 点击清空按钮
       this.clearBtn.unbind('click').bind('click', function (e) {
         e.stopPropagation()
-        // vm.showBody(false)
         vm.onClear()
       })
       // Header点击事件
@@ -122,13 +133,15 @@ let AjDataPicker = function (options) {
         $(document).unbind('click').click(function (ev) {
           ev.stopPropagation()
           vm.showBody(false)
+          $('.vp-picker-time-panel').hide()
         })
         vm.panel.unbind('click').click(function (ev) {
           ev.stopPropagation()
+          vm.panel.find('.vp-picker-time-panel').hide()
         })
       })
     },
-    // 显示/隐藏选项面板
+    // 显示/隐藏选项面板=======================================
     showBody (flag) {
       if (flag) {
         $('.vp-picker-header').removeClass('is-active')
@@ -136,7 +149,9 @@ let AjDataPicker = function (options) {
       } else {
         this.header.removeClass('is-active')
       }
-      this.panel.css(this.getBodyPosition(flag))
+      if (this.panel) {
+        this.panel.css(this.getBodyPosition(flag))
+      }
     },
     // 获取选项面板出现位置信息
     getBodyPosition (flag) {
@@ -191,11 +206,12 @@ let AjDataPicker = function (options) {
         this.addMonthTable(true)
         this.panel.find('.vp-picker-con-header-btn.month').hide()
       } else {
-        if (this.option.showhhmmss) {
-          this.addTimeBlock()
-        }
         this.addMonthTable(false)
         this.addDayTable(true)
+        if (this.option.showhhmmss) {
+          this.addTimeBlock()
+          this.addConFooter()
+        }
       }
     },
     // 设置日历面板显示的日期时间
@@ -237,7 +253,6 @@ let AjDataPicker = function (options) {
           }
         }
       }
-      // console.log(222, this._startDate.getFullYear(), this._startDate.getMonth(), this._endDate)
       this.setLabelText()
     },
     // 添加日历面板显示年月的部分+存放日历tables的div
@@ -410,7 +425,6 @@ let AjDataPicker = function (options) {
       let isStart = target.hasClass('start')
       let arr = this.getMonthArr(isStart)
       let html = '<tr>'
-      // console.log(22222, this._startDate, this._endDate)
       arr.forEach((item, i) => {
         let isToyear = item.y == this.now.y && item.m == this.now.m
         let className = (item.preNext ? 'pre-next ' : '') +
@@ -458,8 +472,47 @@ let AjDataPicker = function (options) {
     },
     // 添加日历面板的时间选择部分
     addTimeBlock () {
+      let html = '<div class="vp-picker-time">' +
+                   '<input class="vp-picker-input-temp date" placeholder="日期" readonly="readonly" unselectable="on" />' +
+                   '<input class="vp-picker-input-temp time" placeholder="时间" readonly="readonly" unselectable="on" />' +
+                   '<div class="vp-picker-time-panel">' +
+                     '<div class="vp-picker-time-opt">' +
+                        '<div class="vp-picker-time-opts hh" data-val="hh">'
+      html += this.getTimeUl(true)
+      html += '</div><div class="vp-picker-time-opts mm" data-val="mm">'
+      html += this.getTimeUl(false)
+      html += '</div><div class="vp-picker-time-opts ss" data-val="ss">'
+      html += this.getTimeUl(false)
+      html += '</div></div>'
+      html += '<span class="vp-picker-time-btn cancel">取消</span><span class="vp-picker-time-btn sure">确定</span>'
+      html += '</div></div>'
+
+      this.cons.each(function () {
+        $(this).prepend(html)
+      })
+      this.setTempTime()
     },
-    // 绑定日历面板上的事件
+    // 获取时间列表html
+    getTimeUl (ishh) {
+      let arr = this.utils.deepCopy(ishh ? arr24 : arr60)
+      let html = '<ul class="vp-picker-time-ul">'
+      arr.forEach(str => {
+        html += '<li data-val="' + parseInt(str) + '">' + str + '</li>'
+      })
+      html += '</ul>'
+      return html
+    },
+    // 日历面板footer，清空/确定按钮
+    addConFooter () {
+      let html = '<div class="vp-picker-footer">' +
+                    '<button type="button" class="vp-picker-footer-btn clear">清空</button>' +
+                    '<button type="button" class="vp-picker-footer-btn sure">确定</button>' +
+                  '</div>'
+      this.panel.find('.vp-picker-body').append(html)
+      this.sureBtn = this.panel.find('.vp-picker-footer-btn.sure')
+      this.clearBtnFooter = this.panel.find('.vp-picker-footer-btn.clear')
+    },
+    // 绑定日历面板上的事件============================================
     bindBodyEvent () {
       let vm = this
       // 年label点击事件
@@ -518,6 +571,8 @@ let AjDataPicker = function (options) {
       this.panel.find('.vp-picker-table-day').on('click', 'td', function (e) {
         vm.clickTd($(this))
       })
+
+      // 双日/月历鼠标滑上事件
       if (this.option.isRange) {
         this.panel.find('.vp-picker-table-day').on('mouseover', 'td', function (e) {
           vm.chooseTds($(this))
@@ -528,30 +583,101 @@ let AjDataPicker = function (options) {
           })
         }
       }
+
+      // 时间模式
+      if (this.option.showhhmmss) {
+        // 日历面板确定/清空按钮点击事件
+        this.sureBtn.unbind('click').bind('click', function (e) {
+          if ($(this).hasClass('disabled')) {
+            return
+          }
+          vm.setInputVal()
+          vm.showBody(false)
+        })
+        this.clearBtnFooter.unbind('click').bind('click', function (e) {
+          vm.onClear()
+        })
+
+        // 时间显示框点击事件
+        this.panel.find('.vp-picker-input-temp.time').unbind('click').bind('click', function (e) {
+          e.stopPropagation()
+          let target = $(this).siblings('.vp-picker-time-panel')
+          target.show()
+          vm.updateTimePanel($(this).parents('.vp-picker-con'), true)
+        })
+
+        // 时间选项面板确定按钮点击事件
+        this.panel.find('.vp-picker-time-btn.sure').unbind('click').bind('click', function (e) {
+          let target = $(this).parents('.vp-picker-time-panel')
+          target.hide()
+        })
+        // 时间选项面板取消按钮点击事件
+        this.panel.find('.vp-picker-time-btn.cancel').unbind('click').bind('click', function (e) {
+          let target = $(this).parents('.vp-picker-time-panel')
+          target.hide()
+          vm._start = vm.setTimeObj(vm._startDate, startInit)
+          vm._end = vm.setTimeObj(vm._endDate, endInit)
+          vm.setTempTime()
+        })
+        // 时间选项面板选项列表滚动事件
+        this.panel.find('.vp-picker-time-ul').unbind('mousewheel').bind('mousewheel', function (e) {
+          var delta = (e.originalEvent.wheelDelta && (e.originalEvent.wheelDelta > 0 ? 1 : -1)) || (e.originalEvent.detail && (e.originalEvent.detail > 0 ? -1 : 1))
+          let h = $(this).scrollTop()
+          let is24 = $(this).parents('.vp-picker-time-opts').hasClass('hh')
+          let max = is24 ? 640 : 1720
+          delta > 0 ? h -= 90 : h += 90
+          if (h >= 0 && h <= max) {
+            vm.changeTime($(this).find('li').eq(h / 30))
+          }
+          return false
+        })
+        // 时间选项面板选项点击事件
+        this.panel.find('.vp-picker-time-ul li').unbind('click').bind('click', function (e) {
+          e.stopPropagation()
+          vm.changeTime($(this))
+        })
+      }
     },
     // 点击选择日期/月份
     clickTd (target) {
       let val = JSON.parse(target.attr('data-val'))
       let day = new Date(val.y, parseInt(val.m) - 1, val.d || 1)
-      // console.log(888, day)
       if (this.option.isRange) {
         if (this._start.text && !this._end.text) {
+          if (!this._endDate) {
+            this._endDate = new Date(val.y, (parseInt(val.m) - 1), val.d || 1, 23, 59, 59)
+          }
           this._start = this.setTimeObj(this._startDate, startInit)
           this._end = this.setTimeObj(this._endDate, endInit)
-          this.setInputVal(true)
-          this.showBody(false)
+          if (this.option.showhhmmss) {
+            this.panel.find('.vp-picker-input-temp').removeAttr('disabled')
+            this.setTempTime()
+            this.sureBtn.removeClass('disabled')
+          } else {
+            this.setInputVal()
+            this.showBody(false)
+          }
         } else {
           this._startDate = day
           this._endDate = null
           this._start = this.setTimeObj(day, startInit)
           this._end = this.utils.deepCopy(endInit)
           this.updateTdClass()
+          if (this.option.showhhmmss) {
+            this.panel.find('.vp-picker-input-temp').attr('disabled', 'disabled')
+            this.sureBtn.addClass('disabled')
+          }
         }
       } else {
         this._startDate = day
         this._start = this.setTimeObj(day, startInit)
-        this.setInputVal(true)
-        this.showBody(false)
+        this.updateTdClass()
+        if (this.option.showhhmmss) {
+          this.setTempTime()
+        } else {
+          this.setInputVal()
+          this.showBody(false)
+        }
       }
     },
     // 双日/月历鼠标滑上选择日期/月份
@@ -560,10 +686,11 @@ let AjDataPicker = function (options) {
       let day = new Date(val.y, (parseInt(val.m) - 1), val.d || 1)
       if (this._start.text && !this._end.text) {
         if (day < new Date(this._start.text)) {
-          this._endDate = new Date(this._start.text)
+          this._endDate = new Date(this._start.y, (parseInt(this._start.m) - 1), this._start.d, 23, 59, 59)
           this._startDate = day
         } else {
-          this._endDate = day
+          this._startDate = new Date(this._start.text)
+          this._endDate = new Date(val.y, (parseInt(val.m) - 1), val.d || 1, 23, 59, 59)
         }
         this.updateTdClass()
       }
@@ -640,7 +767,6 @@ let AjDataPicker = function (options) {
     changeMonth (target, isNext) {
       if (target.hasClass('start')) {
         let val = this.getSiblingMonth(this._startY, this._startM, isNext)
-        console.log(val)
         this._startY = val.y
         this._startM = val.m
       } else {
@@ -670,8 +796,44 @@ let AjDataPicker = function (options) {
       year = isNext ? year + 10 : year - 10
       this.updateYearTd(target, year)
     },
-    aaa (arr) {
-
+    // 改变时间
+    changeTime (li) {
+      let target = li.parents('.vp-picker-con')
+      let isStart = target.hasClass('start')
+      let t = li.parents('.vp-picker-time-opts').attr('data-val')
+      let val = li.attr('data-val')
+      let obj = isStart ? this._startDate : this._endDate
+      if (t === 'hh') {
+        obj.setHours(val)
+      } else if (t === 'mm') {
+        obj.setMinutes(val)
+      } else {
+        obj.setSeconds(val)
+      }
+      isStart ? this._startDate = new Date(obj) : this._endDate = new Date(obj)
+      isStart ? this._start = this.setTimeObj(this._startDate) : this._end = this.setTimeObj(this._endDate)
+      // debugger
+      this.updateTimePanel(target, false)
+      this.setTempTime()
+    },
+    // 更新时间面板
+    updateTimePanel (target, hasEdit) {
+      let isStart = target.hasClass('start')
+      let time = null
+      if (hasEdit) {
+        time = isStart ? this._start : this._end
+      } else {
+        time = isStart ? this.setTimeObj(this._startDate) : this.setTimeObj(this._endDate)
+      }
+      let arr = ['hh', 'mm', 'ss']
+      arr.forEach(t => {
+        let ul = target.find('.vp-picker-time-opts.' + t + ' ul')
+        let num = parseInt(time[t])
+        let li = ul.find('li').eq(num)
+        ul.scrollTop(num * 30)
+        ul.find('li').removeClass('active')
+        li.addClass('active')
+      })
     },
     // 工具方法===================================================
     // 更新前/后一月、前/后一年、前/后十年按钮的可用状态
@@ -725,6 +887,17 @@ let AjDataPicker = function (options) {
         }
       })
     },
+    // 设置日历面板时间区域显示的数据
+    setTempTime () {
+      let start = this._start.text.split(' ')
+      this.startPanel.find('.vp-picker-input-temp.date').val(start[0])
+      this.startPanel.find('.vp-picker-input-temp.time').val(start[1])
+      if (this.option.isRange) {
+        let end = this._end.text.split(' ')
+        this.endPanel.find('.vp-picker-input-temp.date').val(end[0])
+        this.endPanel.find('.vp-picker-input-temp.time').val(end[1])
+      }
+    },
     // 设置日历面板中显示的年月
     setLabelText () {
       this.startPanel.find('.vp-picker-con-header-label.year').text(this._startY + ' 年')
@@ -738,9 +911,14 @@ let AjDataPicker = function (options) {
     setInputVal (init) {
       this.start = this.setTimeObj(this._startDate, (init ? startInit : null))
       this.input.start.val(this.start.text)
-      if (this.option.isRange && this._endDate) {
+      let str = this.start.text
+      if (this.option.isRange) {
         this.end = this.setTimeObj(this._endDate, (init ? endInit : null))
         this.input.end.val(this.end.text)
+        str = JSON.stringify({start: this.start.text, end: this.end.text})
+      }
+      if (this.option.callback.dataChange && !init) {
+        this.option.callback.dataChange(str)
       }
     },
     // 整理时间信息对象
@@ -842,19 +1020,38 @@ let AjDataPicker = function (options) {
       return day < end && day > start
     },
     // 外部调用方法===================================================
-    // 恢复默认值 or 清空
+    // 清空
     onClear () {
-      this.init()
-      // if (this.option.callback.clearOver) {
-      //   this.option.callback.clearOver(this.utils.deepCopy(this.selectData), this)
-      // }
+      this._startDate = null
+      this._endDate = null
+      this.showBody(false)
+      this.setInputVal(true)
+      if (this.option.callback.dataChange) {
+        this.option.callback.dataChange('')
+      }
     },
-    // 组件赋值操作
+    // 赋值
     $_setData (data) {
       let arr = data.split(',')
       this._startDate = new Date(arr[0])
       this._endDate = arr[1] ? new Date(arr[1]) : null
       this.setInputVal()
+    },
+    // 取值
+    $_getData () {
+      return this.option.isRange ? JSON.stringify({start: this.start.text, end: this.end.text}) : this.start.text
+    },
+    // 添加校验文字
+    $_addCheck (flag, msg, type) {
+      return $('#' + this.option.id).attr('val')
+    },
+    // 设置下拉框可用不可用
+    $_disabled (flag) {
+      if (flag) {
+        this.container.addClass('disabled')
+      } else {
+        this.container.removeClass('disabled')
+      }
     }
   }
   // 工具方法
@@ -952,30 +1149,28 @@ let AjDataPicker = function (options) {
   newObj.Opt = {
     id: '',
     preText: '',
+    preStyle: '', // 前置文字样式
     isRange: '',
     startDate: null,
     endDate: null,
     showMonth: false,
     showHotkey: false,
     showhhmmss: false,
-    instyle: {
-      timerBColor: '',
-      timerBRadius: '',
-      timerBW: '',
-      timerBg: '',
-      timerH: '',
-      timerW: '',
-      preBold: '',
-      preColor: '',
-      preSize: '',
+    inputStyle: {
+      width: '', // 宽度
+      height: '', // 高度
+      bgColor: '', // 背景色
+      borderRadius: '', // 边框圆角
+      borderwith: '', // 边框粗细
+      borderColor: '', // 边框颜色
       timerColor: '',
       timerSize: '',
-      preWidth: '',
-      prealign: ''
+      clearColor: '',
+      clearSize: ''
     },
     callback: {
-      dataChange: null,
-      nodata: null
+      dataOver: null, // 加载完毕
+      dataChange: null // 值改变
     }
   }
   return newObj
