@@ -1056,31 +1056,33 @@ let AjDataPicker = function (options) {
     },
     // 添加校验文字
     $_addCheck (flag, msg, type) {
-      if (flag) {
-        let top = ''
-        let left = ''
-        let h = ''
-        if (type === 'right') {
-          top = 0
-          left = this.header.offset().left - this.box.offset().left + this.header.outerWidth() + 15
-          h = this.header.outerHeight() + 'px'
+      setTimeout(() => {
+        if (flag) {
+          let top = ''
+          let left = ''
+          let h = ''
+          if (type === 'right') {
+            top = 0
+            left = this.header.offset().left - this.box.offset().left + this.header.outerWidth() + 15
+            h = this.header.outerHeight() + 'px'
+          } else {
+            top = this.header.outerHeight() + 8
+            left = this.header.offset().left - this.box.offset().left
+            h = '1em'
+          }
+          this.errorMsg.html(msg).css({
+            'display': 'block',
+            'height': h,
+            'line-height': h,
+            'top': top,
+            'left': left
+          })
+          this.header.addClass('error')
         } else {
-          top = this.header.outerHeight() + 8
-          left = this.header.offset().left - this.box.offset().left
-          h = '1em'
+          this.errorMsg.css('display', 'none')
+          this.header.removeClass('error')
         }
-        this.errorMsg.html(msg).css({
-          'display': 'block',
-          'height': h,
-          'line-height': h,
-          'top': top,
-          'left': left
-        })
-        this.header.addClass('error')
-      } else {
-        this.errorMsg.css('display', 'none')
-        this.header.removeClass('error')
-      }
+      }, 10)
     },
     // 设置下拉框可用不可用
     $_disabled (flag) {
