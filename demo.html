@@ -32,9 +32,9 @@ let setting = {
   preStyle: '',
   // startDate: '2021-12-09',
   // startDate: now.getTime(),
-  endDate: now.getTime(),
+  // endDate: now.getTime(),
   isRange: false,
-  showMonth: false,
+  showMonth: true,
   showHotkey: false,
   showhhmmss: true,
   callback: {
@@ -86,13 +86,15 @@ window.onload = function () {
     obj1.$_setData('2020-02-09 05:05:03,2020-11-11 01:01:01')
     obj2.$_setData('2020-02-09 03:03:03,2020-11-11 01:01:01')
   })
-  // $('#addCheck').click(function () {
-  //   // mySelect.$_addCheck(true, '错误提示', 'right')
-  //   mySelect.$_addCheck(true, '错误提示', 'bottom')
-  // })
-  // $('#removeCheck').click(function () {
-  //   mySelect.$_addCheck(false)
-  // })
+  $('#addCheck').click(function () {
+    // mySelect.$_addCheck(true, '错误提示', 'right')
+    obj1.$_addCheck(true, '错误提示', 'right')
+    obj2.$_addCheck(true, '错误提示', 'right')
+  })
+  $('#removeCheck').click(function () {
+    obj1.$_addCheck(false)
+    obj2.$_addCheck(false)
+  })
 }
 </script>
 <style>

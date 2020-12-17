@@ -13,10 +13,19 @@ input::-moz-placeholder { /* Mozilla Firefox 19+ */
 input:-ms-input-placeholder { /* Internet Explorer 10+ */
   color: #c0c4cc;
 }
+.vp-error-msg {
+  display: none;
+  width:auto;
+  color:red;
+  position: absolute;
+  font-size: 12px;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
 
 .vp-picker-pre-text{
   display: inline-block;
-  /* margin-right:8px; */
+  padding-right:8px;
 }
 .vp-picker-container{
   display: inline-block;
@@ -45,6 +54,9 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
 }
 .vp-picker-header.is-range{
   width: 320px;
+}
+.vp-picker-header.error{
+  border: 1px solid red;
 }
 .vp-picker-input-icon{
   display: inline-block;

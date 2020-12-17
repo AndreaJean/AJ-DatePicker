@@ -71,7 +71,7 @@ let AjDataPicker = function (options) {
                  '<i class="vp-picker-input-icon iconfont ' + (this.option.showhhmmss ? 'icon-tubiao_shijian2' : 'icon-rili') + '" style="' + style.rili + '"></i>' +
                  '<input class="vp-picker-input start" placeholder="选择日期' + (this.option.showhhmmss ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
       html += this.option.isRange ? this.createEndTime() : ''
-      html += '<i class="vp-picker-input-icon clear iconfont" style="' + style.clear + '"></i></div></div>'
+      html += '<i class="vp-picker-input-icon clear iconfont" style="' + style.clear + '"></i></div><span class=\'vp-error-msg\'></span></div>'
       this.box.append(html)
       this.container = this.box.find('.vp-picker-container')
       this.header = this.box.find('.vp-picker-header')
@@ -81,6 +81,7 @@ let AjDataPicker = function (options) {
         this.input.end = this.box.find('.vp-picker-input.end')
       }
       this.clearBtn = this.box.find('.vp-picker-input-icon.clear')
+      this.errorMsg = this.box.find('.vp-error-msg')
     },
     // 日历补充结束时间html
     createEndTime () {
@@ -527,17 +528,26 @@ let AjDataPicker = function (options) {
       })
 
       // 前/后十年点击事件
-      this.panel.find('.vp-picker-con-header-btn.year-10').not('.disabled').unbind('click').bind('click', function (e) {
+      this.panel.find('.vp-picker-con-header-btn.year-10').unbind('click').bind('click', function (e) {
+        if ($(this).hasClass('disabled')) {
+          return
+        }
         let target = $(this).parents('.vp-picker-con')
         vm.change10Year(target, $(this).hasClass('next'))
       })
       // 前/后一年点击事件
-      this.panel.find('.vp-picker-con-header-btn.year').not('.disabled').unbind('click').bind('click', function (e) {
+      this.panel.find('.vp-picker-con-header-btn.year').unbind('click').bind('click', function (e) {
+        if ($(this).hasClass('disabled')) {
+          return
+        }
         let target = $(this).parents('.vp-picker-con')
         vm.changeYear(target, $(this).hasClass('next'))
       })
       // 前/后一月点击事件
-      this.panel.find('.vp-picker-con-header-btn.month').not('.disabled').unbind('click').bind('click', function (e) {
+      this.panel.find('.vp-picker-con-header-btn.month').unbind('click').bind('click', function (e) {
+        if ($(this).hasClass('disabled')) {
+          return
+        }
         let target = $(this).parents('.vp-picker-con')
         vm.changeMonth(target, $(this).hasClass('next'))
       })
@@ -999,6 +1009,9 @@ let AjDataPicker = function (options) {
     },
     // 检验是否选中月份（双月历）
     checkStartMonth (item) {
+      if (!this._startDate) {
+        return
+      }
       return item.y == this._startDate.getFullYear() && item.m == (this._startDate.getMonth() + 1)
     },
     checkEndMonth (item) {
@@ -1043,7 +1056,31 @@ let AjDataPicker = function (options) {
     },
     // 添加校验文字
     $_addCheck (flag, msg, type) {
-      return $('#' + this.option.id).attr('val')
+      if (flag) {
+        let top = ''
+        let left = ''
+        let h = ''
+        if (type === 'right') {
+          top = 0
+          left = this.header.offset().left - this.box.offset().left + this.header.outerWidth() + 15
+          h = this.header.outerHeight() + 'px'
+        } else {
+          top = this.header.outerHeight() + 8
+          left = this.header.offset().left - this.box.offset().left
+          h = '1em'
+        }
+        this.errorMsg.html(msg).css({
+          'display': 'block',
+          'height': h,
+          'line-height': h,
+          'top': top,
+          'left': left
+        })
+        this.header.addClass('error')
+      } else {
+        this.errorMsg.css('display', 'none')
+        this.header.removeClass('error')
+      }
     },
     // 设置下拉框可用不可用
     $_disabled (flag) {
