@@ -18,6 +18,7 @@
     <button id='setData'>setData</button>
     <button id='addCheck'>addCheck</button>
     <button id='removeCheck'>removeCheck</button>
+    <button id='clearBtn'>清空</button>
   </div>
 </body>
 
@@ -94,6 +95,11 @@ window.onload = function () {
   $('#removeCheck').click(function () {
     obj1.$_addCheck(false)
     obj2.$_addCheck(false)
+  })
+  $('#clearBtn').click(function () {
+    // obj2.$_addCheck(true, '错误提示', 'right')
+    // obj1.onClear()
+    obj2.onClear()
   })
 }
 </script>

@@ -1039,6 +1039,7 @@ let AjDataPicker = function (options) {
       this._endDate = null
       this.showBody(false)
       this.setInputVal(true)
+      this.$_addCheck(false)
       if (this.option.callback.dataChange) {
         this.option.callback.dataChange('')
       }
@@ -1082,7 +1083,7 @@ let AjDataPicker = function (options) {
           this.errorMsg.css('display', 'none')
           this.header.removeClass('error')
         }
-      }, 10)
+      }, 1)
     },
     // 设置下拉框可用不可用
     $_disabled (flag) {
@@ -1187,14 +1188,14 @@ let AjDataPicker = function (options) {
   // 默认设置
   newObj.Opt = {
     id: '',
-    preText: '',
+    preText: '', // 前置文字内容
     preStyle: '', // 前置文字样式
-    isRange: '',
-    startDate: null,
-    endDate: null,
-    showMonth: false,
-    showHotkey: false,
-    showhhmmss: false,
+    isRange: '', // 是否双日历
+    startDate: null, // 默认开始时间
+    endDate: null, // 默认结束时间
+    showMonth: false, // 是否只提供月份选择
+    showHotkey: false, // 是否显示快捷键
+    showhhmmss: false, // 是否可选择时间
     inputStyle: {
       width: '', // 宽度
       height: '', // 高度
@@ -1202,10 +1203,10 @@ let AjDataPicker = function (options) {
       borderRadius: '', // 边框圆角
       borderwith: '', // 边框粗细
       borderColor: '', // 边框颜色
-      timerColor: '',
-      timerSize: '',
-      clearColor: '',
-      clearSize: ''
+      timerColor: '', // 日历或时间图标颜色
+      timerSize: '', // 日历或时间图标大小
+      clearColor: '', // 清空图标颜色
+      clearSize: '' // 清空图标大小
     },
     callback: {
       dataOver: null, // 加载完毕
