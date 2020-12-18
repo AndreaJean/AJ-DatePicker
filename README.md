@@ -58,7 +58,8 @@ obj.init() //初始化
   },
   callback: {
     dataOver: null, // 加载完毕
-    dataChange: null // 值改变
+    dataChange: null, // 值改变
+    setData: null // 赋值
   }
 }
 ```

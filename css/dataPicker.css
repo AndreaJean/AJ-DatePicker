@@ -22,7 +22,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   transition: all 0.3s;
   white-space: nowrap;
 }
-
+/* 插件 */
 .vp-picker-pre-text{
   display: inline-block;
   padding-right:8px;
@@ -44,9 +44,6 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   font-size: inherit;
   line-height: 40px;
   outline: none;
-}
-.ie11 .vp-picker-header{
-  background-color: #fff;
 }
 .vp-picker-header:hover{
   border: 1px solid #c0c4cc;
@@ -134,8 +131,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   color: #c0c4cc;
   pointer-events: none;
 }
-
-/* panel ==================================================*/
+/* vp-picker-panel */
 .vp-picker-panel{
   position: absolute;
   background: #fff;
@@ -191,10 +187,10 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   cursor:not-allowed;
   display: none;
 }
-/* vp-picker-con-header ========================================== */
+/* vp-picker-con-header */
 .vp-picker-con-header{
   padding-top:15px;
-  height: 28px;
+  height: 40px;
   line-height: 28px;
   text-align: center;
 }
@@ -242,7 +238,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   cursor: default;
 }
 .vp-picker-con-body{
-  padding: 15px 0 5px 0;
+  padding: 5px 0;
   line-height: 30px;
 }
 .vp-picker-con .data-table{
@@ -251,9 +247,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   font-size: 12px;
   user-select: none;
 }
-
-/* day ==================================================*/
-
+/* vp-picker-table-day */
 .vp-picker-table-day {
 }
 .vp-picker-table-day th {
@@ -323,12 +317,14 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   color: #c0c4cc !important;
   background-color: #fff !important;
 }
-
-/* year ==================================================*/
-
+/* vp-picker-table-year */
 .vp-picker-table-year{
   border-top: 1px solid #ebeef5;
+  margin-top:10px;
   display: none;
+}
+.is-range.show-month .vp-picker-table-year{
+  border-top: none;
 }
 .vp-picker-table-year td {
   text-align: center;
@@ -342,16 +338,18 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   color: #409eff;
   font-weight: 700;
 }
-
-/* month ==================================================*/
-
+/* vp-picker-table-month */
 .vp-picker-table-month{
   border-top: 1px solid #ebeef5;
+  margin-top:10px;
   display: none;
+}
+.is-range.show-month .vp-picker-table-month{
+  border-top: none;
 }
 .vp-picker-table-month td {
   text-align: center;
-  padding: 20px 0;
+  padding: 10px 0;
   cursor: pointer;
 }
 .vp-picker-table-month td.today span{
@@ -398,9 +396,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
 .show-month .vp-picker-table-month td.is-start.today div span,.show-month .vp-picker-table-month td.is-end.today div span{
   color: #fff;
 }
-
-/* time ==================================================*/
-
+/* vp-picker-time */
 .vp-picker-time{
   position: relative;
   border-bottom: 1px solid #e4e4e4;
@@ -538,10 +534,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
 .vp-picker-time-ul li.active:hover{
   color: #333;
 }
-
-
-/* footer ==================================================*/
-
+/* vp-picker-footer */
 .vp-picker-footer{
   border-top: 1px solid #e4e4e4;
   padding:10px 15px;
@@ -586,4 +579,13 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   background-color: #fff;
   border-color: #ebeef5;
   color: #c0c4cc;
+}
+.ie11 .vp-picker-header{
+  background-color: #fff;
+}
+.ie11 .vp-picker-range-separator{
+  width: 9%;
+}
+.ie11 .vp-picker-con-header-btn{
+  margin-top:0;
 }

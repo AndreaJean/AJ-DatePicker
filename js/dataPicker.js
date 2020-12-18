@@ -156,7 +156,7 @@ let AjDataPicker = function (options) {
         })
       })
     },
-    // 显示/隐藏选项面板=======================================
+    // 显示/隐藏选项面板
     showBody (flag) {
       if (flag) {
         $('.vp-picker-header').removeClass('is-active')
@@ -166,6 +166,7 @@ let AjDataPicker = function (options) {
       }
       if (this.panel) {
         this.panel.css(this.getBodyPosition(flag))
+        this.addListener()
       }
     },
     // 获取选项面板出现位置信息
@@ -206,9 +207,12 @@ let AjDataPicker = function (options) {
       }
       return css
     },
-    // 生成日历面板
+    // 生成日历面板=======================================
     createBody () {
-      let bodyClass = 'vp-picker-panel' + (this.option.isRange ? ' is-range' : '') + (this.option.showMonth ? ' show-month' : '')
+      let bodyClass = 'vp-picker-panel' +
+                      (this.option.isRange ? ' is-range' : '') +
+                      (this.option.showMonth ? ' show-month' : '') +
+                      (this.isIE11 ? ' ie11' : '')
       let html = '<div class="' + bodyClass + '" id="vp-picker-' + this.option.id + '">' +
                   '<div class="vp-picker-body-wrapper">' +
                   '<div class="vp-picker-body">'
@@ -1059,6 +1063,16 @@ let AjDataPicker = function (options) {
         str += '-01'
       }
       return Date.parse(str.replace(/-/g, '/'))
+    },
+    // 添加页面滚动监听、resize监听
+    addListener () {
+      let vm = this
+      $(window).unbind('resize').bind('resize ', function (e) {
+        vm.showBody(false)
+      })
+      $(document).unbind('scroll').bind('scroll ', function (e) {
+        vm.showBody(false)
+      })
     },
     // 外部调用方法===================================================
     // 清空
