@@ -19,6 +19,7 @@ const endInit = {text: '', y: '', m: '', d: '', hh: '23', mm: '59', ss: '59'}
 
 let AjDataPicker = function (options) {
   let newObj = {
+    isIE11: false,
     option: {},
     box: {},
     initData: { // 初始开始/结束时间
@@ -37,6 +38,11 @@ let AjDataPicker = function (options) {
     _endY: '',
     _endM: '',
     init () {
+      let userAgent = navigator.userAgent
+      if (userAgent.indexOf('Trident') > -1 && userAgent.indexOf('rv:11.0') > -1) {
+        this.isIE11 = true
+      }
+
       this.option = this.utils.mergeObjectDeep(this.Opt, options)
       if (this.option.showMonth) {
         this.option.showhhmmss = false
@@ -46,9 +52,17 @@ let AjDataPicker = function (options) {
       console.log('option', this.option)
       this.box = $('#' + this.option.id)
       this.box.empty()
+      if (this.isIE11) {
+        this.box.addClass('ie11')
+      }
       this.createHeader()
-      this.setInputVal(true)
+      this.setInputVal(true, true)
       this.bindHeaderEvent()
+
+      if (this.option.callback.dataOver) {
+        let str = this.option.isRange ? JSON.stringify({start: this.start.text, end: this.end.text}) : this.start.text
+        this.option.callback.dataOver(str)
+      }
     },
     // 初始化各种存储值
     initValue () {
@@ -160,6 +174,7 @@ let AjDataPicker = function (options) {
       let w = this.panel.outerWidth()
       let scrollH = $(document).scrollTop()
       let scrollW = $(document).scrollLeft()
+      let top = this.header.offset().top - scrollH
       let bottom = $(window).height() - (this.header.offset().top - scrollH) - this.header.outerHeight() - 2
       let right = $(window).width() - (this.header.offset().left - scrollW)
       let left = w < right ? (this.header.offset().left + 'px') : ((this.header.offset().left + this.header.outerWidth() - w) + 'px')
@@ -170,6 +185,14 @@ let AjDataPicker = function (options) {
           'transform': flag ? 'scaleY(1)' : 'scaleY(0)',
           'transform-origin': 'center top 0px',
           'top': (this.header.offset().top + this.header.outerHeight() + 2) + 'px',
+          'left': left
+        }
+      } else if (top < h) {
+        css = {
+          'opacity': flag ? 1 : 0,
+          'transform': flag ? 'scaleY(1)' : 'scaleY(0)',
+          'transform-origin': 'center top 0px',
+          'top': ($(window).height() - h - 2) + 'px',
           'left': left
         }
       } else {
@@ -221,7 +244,7 @@ let AjDataPicker = function (options) {
         this._start = this.utils.deepCopy(this.start)
         this._startY = this._start.y
         this._startM = this._start.m
-        this._startDate = new Date(this.start.text)
+        this._startDate = new Date(this.replaceDate(this._start.text))
       } else {
         this._start = this.utils.deepCopy(startInit)
         this._startY = this.now.y
@@ -233,7 +256,7 @@ let AjDataPicker = function (options) {
           this._end = this.utils.deepCopy(this.end)
           this._endY = this.end.y
           this._endM = this.end.m
-          this._endDate = new Date(this.end.text)
+          this._endDate = new Date(this.replaceDate(this.end.text))
           // 如果开始和结束日期在同一月，右日历自动向后移一月
           if (this._endY === this._startY && this._endM === this._startM) {
             let sibling = this.getSiblingMonth(this.end.y, this.end.m, true)
@@ -695,11 +718,11 @@ let AjDataPicker = function (options) {
       let val = JSON.parse(target.attr('data-val'))
       let day = new Date(val.y, (parseInt(val.m) - 1), val.d || 1)
       if (this._start.text && !this._end.text) {
-        if (day < new Date(this._start.text)) {
+        if (day < new Date(this.replaceDate(this._start.text))) {
           this._endDate = new Date(this._start.y, (parseInt(this._start.m) - 1), this._start.d, 23, 59, 59)
           this._startDate = day
         } else {
-          this._startDate = new Date(this._start.text)
+          this._startDate = new Date(this.replaceDate(this._start.text))
           this._endDate = new Date(val.y, (parseInt(val.m) - 1), val.d || 1, 23, 59, 59)
         }
         this.updateTdClass()
@@ -918,16 +941,16 @@ let AjDataPicker = function (options) {
       }
     },
     // 设置输入框中显示的信息
-    setInputVal (init) {
-      this.start = this.setTimeObj(this._startDate, (init ? startInit : null))
+    setInputVal (isInit, notChange) {
+      this.start = this.setTimeObj(this._startDate, (isInit ? startInit : null))
       this.input.start.val(this.start.text)
       let str = this.start.text
       if (this.option.isRange) {
-        this.end = this.setTimeObj(this._endDate, (init ? endInit : null))
+        this.end = this.setTimeObj(this._endDate, (isInit ? endInit : null))
         this.input.end.val(this.end.text)
         str = JSON.stringify({start: this.start.text, end: this.end.text})
       }
-      if (this.option.callback.dataChange && !init) {
+      if (this.option.callback.dataChange && !notChange) {
         this.option.callback.dataChange(str)
       }
     },
@@ -988,7 +1011,6 @@ let AjDataPicker = function (options) {
       let day1 = this.utils.formatTime(new Date(item.y, (parseInt(item.m) - 1), item.d), 'yyyy/MM/dd')
       let day2 = this.utils.formatTime(this._startDate, 'yyyy/MM/dd')
       return day1 === day2
-      // return item.y == this._start.y && item.m == this._start.m && item.d == this._start.d
     },
     checkEndDay (item) {
       if (!this.option.isRange) {
@@ -997,7 +1019,6 @@ let AjDataPicker = function (options) {
       let day1 = this.utils.formatTime(new Date(item.y, (parseInt(item.m) - 1), item.d), 'yyyy/MM/dd')
       let day2 = this.utils.formatTime(this._endDate, 'yyyy/MM/dd')
       return day1 === day2
-      // return item.y == this._end.y && item.m == this._end.m && item.d == this._end.d
     },
     // 检验是否选中日期之间的日期
     checkBetweenDay (item) {
@@ -1032,6 +1053,13 @@ let AjDataPicker = function (options) {
       let end = new Date(this._endDate.getFullYear(), this._endDate.getMonth())
       return day < end && day > start
     },
+    // 兼容IE11，把时间字符串中的-替换为/，并为只有年月的情况补全日期
+    replaceDate (str) {
+      if (str.split('-').length === 2) {
+        str += '-01'
+      }
+      return Date.parse(str.replace(/-/g, '/'))
+    },
     // 外部调用方法===================================================
     // 清空
     onClear () {
@@ -1040,16 +1068,20 @@ let AjDataPicker = function (options) {
       this.showBody(false)
       this.setInputVal(true)
       this.$_addCheck(false)
-      if (this.option.callback.dataChange) {
-        this.option.callback.dataChange('')
-      }
+      // if (this.option.callback.dataChange) {
+      //   this.option.callback.dataChange('')
+      // }
     },
     // 赋值
     $_setData (data) {
       let arr = data.split(',')
-      this._startDate = new Date(arr[0])
-      this._endDate = arr[1] ? new Date(arr[1]) : null
-      this.setInputVal()
+      this._startDate = new Date(this.replaceDate(arr[0]))
+      this._endDate = arr[1] ? new Date(this.replaceDate(arr[1])) : null
+      this.setInputVal(false, true)
+      if (this.option.callback.setData) {
+        let str = arr[1] ? JSON.stringify({start: this.start.text, end: this.end.text}) : this.start.text
+        this.option.callback.setData(str)
+      }
     },
     // 取值
     $_getData () {
@@ -1098,7 +1130,7 @@ let AjDataPicker = function (options) {
   newObj.utils = {
     // 时间格式转换 (Date(),'yyyy-MM-dd HH:mm:ss')
     formatTime: function (time, format) {
-      var t = new Date(time)
+      var t = this.isString(time) ? new Date(Date.parse(time.replace(/-/g, '/'))) : new Date(time)
       var tf = function (i) { return (i < 10 ? '0' : '') + i }
       return format.replace(/yyyy|MM|dd|HH|mm|ss/g, function (a) {
         switch (a) {
@@ -1210,7 +1242,8 @@ let AjDataPicker = function (options) {
     },
     callback: {
       dataOver: null, // 加载完毕
-      dataChange: null // 值改变
+      dataChange: null, // 值改变
+      setData: null // 赋值
     }
   }
   return newObj

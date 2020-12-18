@@ -36,7 +36,6 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   width: 180px;
   height: 30px;
   padding: 3px 10px;
-  /* background-color: #fff; */
   background-image: none;
   border-radius: 4px;
   border: 1px solid #dcdfe6;
@@ -45,6 +44,9 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   font-size: inherit;
   line-height: 40px;
   outline: none;
+}
+.ie11 .vp-picker-header{
+  background-color: #fff;
 }
 .vp-picker-header:hover{
   border: 1px solid #c0c4cc;
@@ -353,7 +355,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   cursor: pointer;
 }
 .vp-picker-table-month td.today span{
-  color: #409eff !important;
+  color: #409eff;
 }
 .vp-picker-table-month td.is-start,.vp-picker-table-month td.is-end  {
   color: #409eff;
@@ -392,6 +394,9 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
 }
 .show-month.is-range .vp-picker-table-month td.is-start div,.show-month.is-range .vp-picker-table-month td.is-end div{
   background-color: #f2f6fc;
+}
+.show-month .vp-picker-table-month td.is-start.today div span,.show-month .vp-picker-table-month td.is-end.today div span{
+  color: #fff;
 }
 
 /* time ==================================================*/
