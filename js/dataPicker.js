@@ -44,8 +44,7 @@ let AjDataPicker = function (options) {
       }
 
       this.option = this.utils.mergeObjectDeep(this.Opt, options)
-      if (this.option.showMonth) {
-        this.option.showhhmmss = false
+      if (this.option.showType !== 'date') {
         this.option.showHotkey = false
       }
       this.initValue()
@@ -67,13 +66,13 @@ let AjDataPicker = function (options) {
     // 初始化各种存储值
     initValue () {
       this.now = this.setTimeObj(new Date())
-      if (this.option.startDate) {
-        this.initData.start = new Date(this.option.startDate)
-        this._startDate = new Date(this.option.startDate)
+      if (this.option.defaultValue.length) {
+        this.initData.start = new Date(this.option.defaultValue[0])
+        this._startDate = new Date(this.option.defaultValue[0])
       }
-      if (this.option.endDate) {
-        this.initData.end = new Date(this.option.endDate)
-        this._endDate = new Date(this.option.endDate)
+      if (this.option.defaultValue.length > 1) {
+        this.initData.end = new Date(this.option.defaultValue[1])
+        this._endDate = new Date(this.option.defaultValue[1])
       }
     },
     // 生成输入框============================================
@@ -82,8 +81,8 @@ let AjDataPicker = function (options) {
       let html = (this.option.preText !== '' ? ('<span class="vp-picker-pre-text" style="' + this.option.preStyle + '">' + this.option.preText + '</span>') : '') +
                  '<div class="vp-picker-container">' +
                  '<div class="vp-picker-header' + (this.option.isRange ? ' is-range' : '') + '" style="' + style.input + '">' +
-                 '<i class="vp-picker-input-icon iconfont ' + (this.option.showhhmmss ? 'icon-tubiao_shijian2' : 'icon-rili') + '" style="' + style.rili + '"></i>' +
-                 '<input class="vp-picker-input start" placeholder="选择日期' + (this.option.showhhmmss ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
+                 '<i class="vp-picker-input-icon iconfont ' + (this.option.showType === 'time' ? 'icon-tubiao_shijian2' : 'icon-rili') + '" style="' + style.rili + '"></i>' +
+                 '<input class="vp-picker-input start" placeholder="选择日期' + (this.option.showType === 'time' ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
       html += this.option.isRange ? this.createEndTime() : ''
       html += '<i class="vp-picker-input-icon clear iconfont" style="' + style.clear + '"></i></div><span class=\'vp-error-msg\'></span></div>'
       this.box.append(html)
@@ -99,8 +98,8 @@ let AjDataPicker = function (options) {
     },
     // 日历补充结束时间html
     createEndTime () {
-      let html = '<span class="vp-picker-range-separator">至</span>' +
-                 '<input class="vp-picker-input end" placeholder="选择日期' + (this.option.showhhmmss ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
+      let html = '<span class="vp-picker-range-separator">' + this.option.rangeSeparator + '</span>' +
+                 '<input class="vp-picker-input end" placeholder="选择日期' + (this.option.showType === 'time' ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
       return html
     },
     // 整理输入框自定义样式
@@ -211,12 +210,13 @@ let AjDataPicker = function (options) {
     createBody () {
       let bodyClass = 'vp-picker-panel' +
                       (this.option.isRange ? ' is-range' : '') +
-                      (this.option.showMonth ? ' show-month' : '') +
-                      (this.isIE11 ? ' ie11' : '')
+                      (this.option.showType === 'month' ? ' show-month' : '') +
+                      (this.isIE11 ? ' ie11' : '') +
+                      (this.option.popperClass.length ? (' ' + this.option.popperClass) : '')
       let html = '<div class="' + bodyClass + '" id="vp-picker-' + this.option.id + '">' +
                   '<div class="vp-picker-body-wrapper">' +
                   '<div class="vp-picker-body">'
-      html += this.option.showhhmmss ? '<div class="vp-picker-body-header"></div>' : ''
+      html += this.option.showType === 'time' ? '<div class="vp-picker-body-header"></div>' : ''
       html += '<div class="vp-picker-con start"><div class="vp-picker-mask"></div></div>' +
               (this.option.isRange ? '<div class="vp-picker-con end"><div class="vp-picker-mask"></div></div>' : '')
       html += '</div></div></div>'
@@ -228,15 +228,15 @@ let AjDataPicker = function (options) {
 
       this.setTempInitData()
 
-      this.addConHeader(this.option.showMonth)
+      this.addConHeader(this.option.showType === 'month')
       this.addYearTable()
-      if (this.option.showMonth) {
+      if (this.option.showType === 'month') {
         this.addMonthTable(true)
         this.panel.find('.vp-picker-con-header-btn.month').hide()
       } else {
         this.addMonthTable(false)
         this.addDayTable(true)
-        if (this.option.showhhmmss) {
+        if (this.option.showType === 'time') {
           this.addTimeBlock()
           this.addConFooter()
         }
@@ -267,7 +267,7 @@ let AjDataPicker = function (options) {
             this._endY = sibling.y
             this._endM = sibling.m
           }
-          if (this.option.showMonth && this._endY === this._startY) {
+          if (this.option.showType === 'month' && this._endY === this._startY) {
             this._endY = parseInt(this._endY) + 1
           }
         } else {
@@ -276,7 +276,7 @@ let AjDataPicker = function (options) {
           this._endY = sibling.y
           this._endM = sibling.m
           this._endDate = null
-          if (this.option.showMonth && this._endY === this._startY) {
+          if (this.option.showType === 'month' && this._endY === this._startY) {
             this._endY = parseInt(this._startY) + 1
           }
         }
@@ -323,15 +323,9 @@ let AjDataPicker = function (options) {
       let arr = this.getDayArr(isStart ? this._startY : this._endY, isStart ? this._startM : this._endM)
       let html = '<tr>'
       arr.forEach((item, i) => {
-        let isToday = this.checkToday(item)
-        let isStart = this.checkStartDay(item)
-        let isEnd = this.checkEndDay(item)
-        let isBetween = this.checkBetweenDay(item)
         let className = (item.preNext ? 'pre-next ' : '') +
-                        (isToday ? 'today ' : '') +
-                        (isStart ? 'is-start ' : '') +
-                        (isEnd ? 'is-end ' : '') +
-                        (isBetween ? 'is-between ' : '')
+                        (this.checkToday(item) ? 'today ' : '') +
+                        this.getTdClass(item)
         html += '<td data-val=\'' + JSON.stringify(item) + '\' class=\'' + className + '\'><div><span>' + item.d + '</span></div></td>'
         html += i % 7 === 6 ? '</tr><tr>' : ''
       })
@@ -424,9 +418,9 @@ let AjDataPicker = function (options) {
       let arr = []
       if (this.option.isRange) {
         if (target.hasClass('start')) {
-          e = e < parseInt(this._endY) ? e : ((this._endM == 1 || this.option.showMonth) ? parseInt(this._endY) - 1 : parseInt(this._endY))
+          e = e < parseInt(this._endY) ? e : ((this._endM == 1 || this.option.showType === 'month') ? parseInt(this._endY) - 1 : parseInt(this._endY))
         } else {
-          s = s > parseInt(this._startY) ? s : ((this._startM == 12 || this.option.showMonth) ? parseInt(this._startY) + 1 : parseInt(this._startY))
+          s = s > parseInt(this._startY) ? s : ((this._startM == 12 || this.option.showType === 'month') ? parseInt(this._startY) + 1 : parseInt(this._startY))
         }
       }
       for (let i = s; i <= e; i++) {
@@ -458,10 +452,8 @@ let AjDataPicker = function (options) {
         let className = (item.preNext ? 'pre-next ' : '') +
                         (isToyear ? 'today ' : '')
 
-        if (this.option.showMonth) {
-          className += (this.checkBetweenMonth(item) ? 'is-between ' : '') +
-                       (this.checkStartMonth(item) ? 'is-start ' : '') +
-                       ((this.option.isRange && this.checkEndMonth(item)) ? 'is-end ' : '')
+        if (this.option.showType === 'month') {
+          className += this.getTdClass(item)
         } else {
           className += ((isStart && this._startY == this.start.y && item.m == this.start.m) ? 'is-start ' : '') +
                        ((this.option.isRange && !isStart && this._endY == this.end.y && item.m == this.end.m) ? 'is-end ' : '')
@@ -592,7 +584,10 @@ let AjDataPicker = function (options) {
       // 月点击事件
       this.panel.find('.vp-picker-table-month td').unbind('click')
       this.panel.find('.vp-picker-table-month').on('click', 'td', function (e) {
-        if (vm.option.showMonth) {
+        if ($(this).hasClass('disabled')) {
+          return
+        }
+        if (vm.option.showType === 'month') {
           vm.clickTd($(this))
         } else {
           let target = $(this).parents('.vp-picker-con')
@@ -606,6 +601,9 @@ let AjDataPicker = function (options) {
       // 日期点击事件
       this.panel.find('.vp-picker-table-day td').unbind()
       this.panel.find('.vp-picker-table-day').on('click', 'td', function (e) {
+        if ($(this).hasClass('disabled')) {
+          return
+        }
         vm.clickTd($(this))
       })
 
@@ -614,7 +612,7 @@ let AjDataPicker = function (options) {
         this.panel.find('.vp-picker-table-day').on('mouseover', 'td', function (e) {
           vm.chooseTds($(this))
         })
-        if (this.option.showMonth) {
+        if (this.option.showType === 'month') {
           this.panel.find('.vp-picker-table-month').on('mouseover', 'td', function (e) {
             vm.chooseTds($(this))
           })
@@ -622,7 +620,7 @@ let AjDataPicker = function (options) {
       }
 
       // 时间模式
-      if (this.option.showhhmmss) {
+      if (this.option.showType === 'time') {
         // 日历面板确定/清空按钮点击事件
         this.sureBtn.unbind('click').bind('click', function (e) {
           if ($(this).hasClass('disabled')) {
@@ -686,7 +684,7 @@ let AjDataPicker = function (options) {
           }
           this._start = this.setTimeObj(this._startDate, startInit)
           this._end = this.setTimeObj(this._endDate, endInit)
-          if (this.option.showhhmmss) {
+          if (this.option.showType === 'time') {
             this.panel.find('.vp-picker-input-temp').removeAttr('disabled')
             this.setTempTime()
             this.sureBtn.removeClass('disabled')
@@ -700,7 +698,7 @@ let AjDataPicker = function (options) {
           this._start = this.setTimeObj(day, startInit)
           this._end = this.utils.deepCopy(endInit)
           this.updateTdClass()
-          if (this.option.showhhmmss) {
+          if (this.option.showType === 'time') {
             this.panel.find('.vp-picker-input-temp').attr('disabled', 'disabled')
             this.sureBtn.addClass('disabled')
           }
@@ -709,7 +707,7 @@ let AjDataPicker = function (options) {
         this._startDate = day
         this._start = this.setTimeObj(day, startInit)
         this.updateTdClass()
-        if (this.option.showhhmmss) {
+        if (this.option.showType === 'time') {
           this.setTempTime()
         } else {
           this.setInputVal()
@@ -735,25 +733,11 @@ let AjDataPicker = function (options) {
     // 鼠标滑上时更新双日/月历上的选中效果
     updateTdClass () {
       let vm = this
-      let target = this.option.showMonth ? this.panel.find('.vp-picker-table-month td') : this.panel.find('.vp-picker-table-day td')
+      let target = this.option.showType === 'month' ? this.panel.find('.vp-picker-table-month td') : this.panel.find('.vp-picker-table-day td')
       target.each(function () {
         $(this).removeClass('is-start is-end is-between')
         let item = JSON.parse($(this).attr('data-val'))
-        let isStart = false
-        let isEnd = false
-        let isBetween = false
-        if (vm.option.showMonth) {
-          isStart = vm.checkStartMonth(item)
-          isEnd = vm.checkEndMonth(item)
-          isBetween = vm.checkBetweenMonth(item)
-        } else {
-          isStart = vm.checkStartDay(item)
-          isEnd = vm.checkEndDay(item)
-          isBetween = vm.checkBetweenDay(item)
-        }
-        let className = (isStart ? 'is-start' : '') +
-                        (isEnd ? ' is-end' : '') +
-                        (isBetween ? ' is-between' : '')
+        let className = vm.getTdClass(item)
         $(this).addClass(className)
       })
     },
@@ -772,7 +756,7 @@ let AjDataPicker = function (options) {
     },
     // 显示月表格
     showMonthTable (target) {
-      if (!this.option.showMonth) {
+      if (!this.option.showType === 'month') {
         target.find('.vp-picker-con-header-label.year-to-year').show()
       } else {
         target.siblings('.vp-picker-con').find('.vp-picker-mask').hide()
@@ -821,7 +805,7 @@ let AjDataPicker = function (options) {
       } else {
         this._endY = isNext ? parseInt(this._endY) + 1 : parseInt(this._endY) - 1
       }
-      if (!this.option.showMonth) {
+      if (!this.option.showType === 'month') {
         this.updateDayTd(target)
       }
       this.updateMonthTd(target)
@@ -899,7 +883,7 @@ let AjDataPicker = function (options) {
           if (parseInt(vm._startY) === parseInt(vm._endY) - 1 && (parseInt(vm._endM) === 1 || parseInt(vm._startM) === 12)) {
             yBtn.addClass('disabled')
           }
-          if (vm.option.showMonth && parseInt(vm._startY) === parseInt(vm._endY) - 1) {
+          if (vm.option.showType === 'month' && parseInt(vm._startY) === parseInt(vm._endY) - 1) {
             yBtn.addClass('disabled')
           }
         } else { // 日
@@ -973,10 +957,10 @@ let AjDataPicker = function (options) {
         mm: init ? init.mm : arr[4],
         ss: init ? init.ss : arr[5]
       }
-      if (this.option.showMonth) {
+      if (this.option.showType === 'month') {
         res.text = arr[0] + '-' + arr[1]
       }
-      if (this.option.showhhmmss) {
+      if (this.option.showType === 'time') {
         res.text += ' ' + res.hh + ':' + res.mm + ':' + res.ss
       }
       return res
@@ -1006,9 +990,49 @@ let AjDataPicker = function (options) {
       }
       return num
     },
+    // 获取td的class
+    getTdClass (item) {
+      let className = ''
+      if (this.option.showType === 'month') {
+        let isStart = this.checkStartMonth(item)
+        let isEnd = this.checkEndMonth(item)
+        let isBetween = this.checkBetweenMonth(item)
+        let isDisabled = this.checkDisabledMonth(item)
+        className = (isStart && !isDisabled ? 'is-start' : '') +
+                    (isEnd && !isDisabled ? ' is-end' : '') +
+                    (isBetween && !isDisabled ? ' is-between' : '') +
+                    (isDisabled ? 'disabled ' : '')
+      } else {
+        let isStart = this.checkStartDay(item)
+        let isEnd = this.checkEndDay(item)
+        let isBetween = this.checkBetweenDay(item)
+        let isDisabled = this.checkDisabledDay(item)
+        let isPreNext = $(this).hasClass('pre-next')
+        className = (isStart && !isPreNext && !isDisabled ? 'is-start' : '') +
+                    (isEnd && !isPreNext && !isDisabled ? ' is-end' : '') +
+                    (isBetween && !isPreNext && !isDisabled ? ' is-between' : '') +
+                    (isDisabled ? 'disabled ' : '')
+      }
+      return className
+    },
     // 检验是否当日
     checkToday (item) {
       return item.y == this.now.y && item.m == this.now.m && item.d == this.now.d
+    },
+    // 检验是否禁选日期
+    checkDisabledDay (item) {
+      let flag1 = false
+      let flag2 = false
+      let day = new Date(item.y, (parseInt(item.m) - 1), item.d)
+      if (this.utils.checkNull(this.option.disabledDate.before)) {
+        let before = new Date(this.option.disabledDate.before)
+        flag1 = day < before
+      }
+      if (this.utils.checkNull(this.option.disabledDate.after)) {
+        let after = new Date(this.option.disabledDate.after)
+        flag2 = day > after
+      }
+      return flag1 || flag2
     },
     // 检验是否选中日期
     checkStartDay (item) {
@@ -1031,6 +1055,23 @@ let AjDataPicker = function (options) {
       }
       let data = new Date(item.y, (parseInt(item.m) - 1), item.d)
       return data <= this._endDate && data >= new Date(this.utils.formatTime(this._startDate, 'yyyy/MM/dd'))
+    },
+    // 检验是否禁选日期
+    checkDisabledMonth (item) {
+      let flag1 = false
+      let flag2 = false
+      let day = new Date(item.y, (parseInt(item.m) - 1), 1)
+      if (this.utils.checkNull(this.option.disabledDate.before)) {
+        let time = new Date(this.option.disabledDate.before)
+        let before = new Date(time.getFullYear(), time.getMonth(), 1)
+        flag1 = day < before
+      }
+      if (this.utils.checkNull(this.option.disabledDate.after)) {
+        let time = new Date(this.option.disabledDate.after)
+        let after = new Date(time.getFullYear(), time.getMonth(), 1)
+        flag2 = day > after
+      }
+      return flag1 || flag2
     },
     // 检验是否选中月份（双月历）
     checkStartMonth (item) {
@@ -1138,6 +1179,13 @@ let AjDataPicker = function (options) {
       } else {
         this.container.removeClass('disabled')
       }
+    },
+    // 设置禁用日期
+    $_setDisabledDate (before, after) {
+      this.option.disabledDate = { // 禁止选中的日期/月
+        before: before || '', // 该日期前不可选
+        after: after || '' // 该日期后不可选
+      }
     }
   }
   // 工具方法
@@ -1236,12 +1284,16 @@ let AjDataPicker = function (options) {
     id: '',
     preText: '', // 前置文字内容
     preStyle: '', // 前置文字样式
+    popperClass: '', // 选项面板的类名
     isRange: '', // 是否双日历
-    startDate: null, // 默认开始时间
-    endDate: null, // 默认结束时间
-    showMonth: false, // 是否只提供月份选择
+    rangeSeparator: '至', // 选择范围时的分隔符
+    defaultValue: [], // 初始化时默认显示的时间，[开始，结束]
+    disabledDate: { // 禁止选中的日期/月
+      before: null, // 该日期前不可选
+      after: null // 该日期后不可选
+    },
+    showType: 'date', // 显示类型，'month'、'date'、'time'
     showHotkey: false, // 是否显示快捷键
-    showhhmmss: false, // 是否可选择时间
     inputStyle: {
       width: '', // 宽度
       height: '', // 高度

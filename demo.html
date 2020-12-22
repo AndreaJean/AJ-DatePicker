@@ -19,6 +19,7 @@
     <button id='addCheck'>addCheck</button>
     <button id='removeCheck'>removeCheck</button>
     <button id='clearBtn'>清空</button>
+    <button id='setDisabledDate'>setDisabledDate</button>
   </div>
 </body>
 
@@ -34,10 +35,10 @@ let setting = {
   // startDate: '2021-12-09',
   // startDate: now.getTime(),
   // endDate: now.getTime(),
+  defaultValue: [now.getTime()],
   isRange: false,
-  showMonth: true,
   showHotkey: false,
-  showhhmmss: true,
+  showType: 'month',
   callback: {
     dataChange: function (data) {
       console.log('dataChange', data)
@@ -51,16 +52,19 @@ let setting1 = {
   id: 'demo2',
   preText: '双日历：',
   preStyle: '',
+  // rangeSeparator: '-',
   // startDate: now.getTime() - 3600 * 1000 * 24,
   // endDate: now.getTime() + 3600 * 1000 * 24,
   // startDate: '2020-02-09 05:05:03',
   // endDate: '2024-3-11 01:01:01',
-  startDate: '2020-02',
-  endDate: '2024-3',
+  // defaultValue: ['2020-02', '2024-3'],
+  // disabledDate: {
+  //   before: '2020/12/20',
+  //   after: '2020/12/22'
+  // },
   isRange: true,
-  showMonth: true,
   showHotkey: false,
-  showhhmmss: true,
+  showType: 'date',
   callback: {
     dataChange: function (data) {
       console.log('dataChange', data)
@@ -99,9 +103,11 @@ window.onload = function () {
     obj2.$_addCheck(false)
   })
   $('#clearBtn').click(function () {
-    // obj2.$_addCheck(true, '错误提示', 'right')
-    // obj1.onClear()
     obj2.onClear()
+  })
+  $('#setDisabledDate').click(function () {
+    obj1.$_setDisabledDate('', '2020/10/22')
+    obj2.$_setDisabledDate('', '2020/12/22')
   })
 }
 </script>

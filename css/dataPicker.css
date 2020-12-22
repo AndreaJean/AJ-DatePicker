@@ -298,7 +298,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   background-color: #409eff;
 }
 .vp-picker-table-day td.is-between div {
-  background-color: #f2f6fc;
+  background-color: #e9f1fb;
 }
 .vp-picker-table-day td.is-start.is-between div {
   margin-left: 5px;
@@ -313,10 +313,20 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
 .vp-picker-table-day td.pre-next.is-between div {
   background-color: #fff;
 }
-.vp-picker-table-day td.pre-next span {
-  color: #c0c4cc !important;
-  background-color: #fff !important;
+.vp-picker-table-day td.pre-next div span {
+  color: #c0c4cc;
+  background-color: #fff;
 }
+.vp-picker-table-day td.disabled div,.vp-picker-table-day td.disabled:hover div {
+  background-color: #f5f7fa;
+  cursor: not-allowed;
+  color: #c0c4cc;
+}
+.vp-picker-table-day td.disabled div span,.vp-picker-table-day td.disabled:hover div span {
+  background-color: #f5f7fa;
+  color: #c0c4cc;
+}
+
 /* vp-picker-table-year */
 .vp-picker-table-year{
   border-top: 1px solid #ebeef5;
@@ -384,7 +394,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   border-bottom-right-radius: 24px;
 }
 .show-month .vp-picker-table-month td.is-between div{
-  background-color: #f2f6fc;
+  background-color: #e9f1fb;
 }
 .show-month .vp-picker-table-month td.is-start span,.show-month .vp-picker-table-month td.is-end span{
   color: #fff;
@@ -395,6 +405,15 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
 }
 .show-month .vp-picker-table-month td.is-start.today div span,.show-month .vp-picker-table-month td.is-end.today div span{
   color: #fff;
+}
+.show-month .vp-picker-table-month td.disabled div,.show-month .vp-picker-table-month td.disabled:hover div {
+  background-color: #f5f7fa;
+  cursor: not-allowed;
+  color: #c0c4cc;
+}
+.show-month .vp-picker-table-month td.disabled div span,.show-month .vp-picker-table-month td.disabled:hover div span {
+  background-color: #f5f7fa;
+  color: #c0c4cc;
 }
 /* vp-picker-time */
 .vp-picker-time{
