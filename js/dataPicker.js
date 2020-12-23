@@ -1,4 +1,4 @@
-const arrMonth = [
+let arrMonth = [
   {text: '一月', m: 1},
   {text: '二月', m: 2},
   {text: '三月', m: 3},
@@ -12,14 +12,16 @@ const arrMonth = [
   {text: '十一月', m: 11},
   {text: '十二月', m: 12}
 ]
-const arr24 = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
-const arr60 = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59']
-const startInit = {text: '', y: '', m: '', d: '', hh: '00', mm: '00', ss: '00'}
-const endInit = {text: '', y: '', m: '', d: '', hh: '23', mm: '59', ss: '59'}
+let arr24 = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
+let arr60 = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59']
+// let startInit = {text: '', y: '', m: '', d: '', hh: '00', mm: '00', ss: '00'}
+// let endInit = {text: '', y: '', m: '', d: '', hh: '23', mm: '59', ss: '59'}
 
 let AjDataPicker = function (options) {
   let newObj = {
     isIE11: false,
+    startInit: {text: '', y: '', m: '', d: '', hh: '00', mm: '00', ss: '00'},
+    endInit: {text: '', y: '', m: '', d: '', hh: '23', mm: '59', ss: '59'},
     option: {},
     box: {},
     initData: { // 初始开始/结束时间
@@ -27,16 +29,17 @@ let AjDataPicker = function (options) {
       end: null
     },
     now: {}, // 当前时间
-    start: startInit, // 选择结束的开始/结束时间信息
-    end: endInit,
+    start: {}, // 选择结束的开始/结束时间信息
+    end: {},
     _startDate: null, // 选择中的开始/结束时间，Data类型，双日历鼠标滑动时跟随改变
     _endDate: null,
-    _start: startInit, // 选择中的的开始/结束时间信息，双日历鼠标点击td时跟随改变
-    _end: endInit,
+    _start: {}, // 选择中的的开始/结束时间信息，双日历鼠标点击td时跟随改变
+    _end: {},
     _startY: '', // 日历面板的年月
     _startM: '',
     _endY: '',
     _endM: '',
+    placeholder: '选择日期',
     init () {
       let userAgent = navigator.userAgent
       if (userAgent.indexOf('Trident') > -1 && userAgent.indexOf('rv:11.0') > -1) {
@@ -65,6 +68,18 @@ let AjDataPicker = function (options) {
     },
     // 初始化各种存储值
     initValue () {
+      if (this.option.defaultTime.length) {
+        let arr = this.option.defaultTime[0].split(':')
+        this.startInit.hh = arr[0]
+        this.startInit.mm = arr[1]
+        this.startInit.ss = arr[2]
+      }
+      if (this.option.defaultTime.length > 1) {
+        let arr = this.option.defaultTime[1].split(':')
+        this.endInit.hh = arr[0]
+        this.endInit.mm = arr[1]
+        this.endInit.ss = arr[2]
+      }
       this.now = this.setTimeObj(new Date())
       if (this.option.defaultValue.length) {
         this.initData.start = new Date(this.option.defaultValue[0])
@@ -74,15 +89,22 @@ let AjDataPicker = function (options) {
         this.initData.end = new Date(this.option.defaultValue[1])
         this._endDate = new Date(this.option.defaultValue[1])
       }
+      if (this.option.showType === 'month') {
+        this.placeholder = '选择月份'
+      }
+      if (this.option.showType === 'time') {
+        this.placeholder += '时间'
+      }
     },
     // 生成输入框============================================
     createHeader () {
       let style = this.getStyle()
+      let placeholder = this.option.placeholder.start.length ? this.option.placeholder.start : this.placeholder
       let html = (this.option.preText !== '' ? ('<span class="vp-picker-pre-text" style="' + this.option.preStyle + '">' + this.option.preText + '</span>') : '') +
                  '<div class="vp-picker-container">' +
                  '<div class="vp-picker-header' + (this.option.isRange ? ' is-range' : '') + '" style="' + style.input + '">' +
                  '<i class="vp-picker-input-icon iconfont ' + (this.option.showType === 'time' ? 'icon-tubiao_shijian2' : 'icon-rili') + '" style="' + style.rili + '"></i>' +
-                 '<input class="vp-picker-input start" placeholder="选择日期' + (this.option.showType === 'time' ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
+                 '<input class="vp-picker-input start" placeholder="' + placeholder + '" style="text-align:' + this.option.align + ';" readonly="readonly" unselectable="on" />'
       html += this.option.isRange ? this.createEndTime() : ''
       html += '<i class="vp-picker-input-icon clear iconfont" style="' + style.clear + '"></i></div><span class=\'vp-error-msg\'></span></div>'
       this.box.append(html)
@@ -98,8 +120,9 @@ let AjDataPicker = function (options) {
     },
     // 日历补充结束时间html
     createEndTime () {
+      let placeholder = this.option.placeholder.end.length ? this.option.placeholder.end : this.placeholder
       let html = '<span class="vp-picker-range-separator">' + this.option.rangeSeparator + '</span>' +
-                 '<input class="vp-picker-input end" placeholder="选择日期' + (this.option.showType === 'time' ? '时间' : '') + '" readonly="readonly" unselectable="on" />'
+                 '<input class="vp-picker-input end" placeholder="' + placeholder + '" style="text-align:' + this.option.align + ';" readonly="readonly" unselectable="on" />'
       return html
     },
     // 整理输入框自定义样式
@@ -250,7 +273,7 @@ let AjDataPicker = function (options) {
         this._startM = this._start.m
         this._startDate = new Date(this.replaceDate(this._start.text))
       } else {
-        this._start = this.utils.deepCopy(startInit)
+        this._start = this.utils.deepCopy(this.startInit)
         this._startY = this.now.y
         this._startM = this.now.m
         this._startDate = null
@@ -271,7 +294,7 @@ let AjDataPicker = function (options) {
             this._endY = parseInt(this._endY) + 1
           }
         } else {
-          this._end = this.utils.deepCopy(endInit)
+          this._end = this.utils.deepCopy(this.endInit)
           let sibling = this.getSiblingMonth(this.now.y, this.now.m, true)
           this._endY = sibling.y
           this._endM = sibling.m
@@ -650,8 +673,8 @@ let AjDataPicker = function (options) {
         this.panel.find('.vp-picker-time-btn.cancel').unbind('click').bind('click', function (e) {
           let target = $(this).parents('.vp-picker-time-panel')
           target.hide()
-          vm._start = vm.setTimeObj(vm._startDate, startInit)
-          vm._end = vm.setTimeObj(vm._endDate, endInit)
+          vm._start = vm.setTimeObj(vm._startDate, vm.startInit)
+          vm._end = vm.setTimeObj(vm._endDate, vm.endInit)
           vm.setTempTime()
         })
         // 时间选项面板选项列表滚动事件
@@ -682,8 +705,8 @@ let AjDataPicker = function (options) {
           if (!this._endDate) {
             this._endDate = new Date(val.y, (parseInt(val.m) - 1), val.d || 1, 23, 59, 59)
           }
-          this._start = this.setTimeObj(this._startDate, startInit)
-          this._end = this.setTimeObj(this._endDate, endInit)
+          this._start = this.setTimeObj(this._startDate, this.startInit)
+          this._end = this.setTimeObj(this._endDate, this.endInit)
           if (this.option.showType === 'time') {
             this.panel.find('.vp-picker-input-temp').removeAttr('disabled')
             this.setTempTime()
@@ -695,8 +718,8 @@ let AjDataPicker = function (options) {
         } else {
           this._startDate = day
           this._endDate = null
-          this._start = this.setTimeObj(day, startInit)
-          this._end = this.utils.deepCopy(endInit)
+          this._start = this.setTimeObj(day, this.startInit)
+          this._end = this.utils.deepCopy(this.endInit)
           this.updateTdClass()
           if (this.option.showType === 'time') {
             this.panel.find('.vp-picker-input-temp').attr('disabled', 'disabled')
@@ -705,7 +728,7 @@ let AjDataPicker = function (options) {
         }
       } else {
         this._startDate = day
-        this._start = this.setTimeObj(day, startInit)
+        this._start = this.setTimeObj(day, this.startInit)
         this.updateTdClass()
         if (this.option.showType === 'time') {
           this.setTempTime()
@@ -930,11 +953,11 @@ let AjDataPicker = function (options) {
     },
     // 设置输入框中显示的信息
     setInputVal (isInit, notChange) {
-      this.start = this.setTimeObj(this._startDate, (isInit ? startInit : null))
+      this.start = this.setTimeObj(this._startDate, (isInit ? this.startInit : null))
       this.input.start.val(this.start.text)
       let str = this.start.text
       if (this.option.isRange) {
-        this.end = this.setTimeObj(this._endDate, (isInit ? endInit : null))
+        this.end = this.setTimeObj(this._endDate, (isInit ? this.endInit : null))
         this.input.end.val(this.end.text)
         str = JSON.stringify({start: this.start.text, end: this.end.text})
       }
@@ -1285,9 +1308,15 @@ let AjDataPicker = function (options) {
     preText: '', // 前置文字内容
     preStyle: '', // 前置文字样式
     popperClass: '', // 选项面板的类名
+    placeholder: {
+      start: '', // 单日历输入框、双日历开始时间输入框的占位内容
+      end: '' // 双日历结束时间的占位内容
+    },
+    align: 'left', // 输入框中内容的对齐方式
     isRange: '', // 是否双日历
     rangeSeparator: '至', // 选择范围时的分隔符
-    defaultValue: [], // 初始化时默认显示的时间，[开始，结束]
+    defaultValue: [], // 初始化时默认显示的时间，[单日历时间/双日历开始时间，结束]
+    defaultTime: [], // 选中日期后的默认具体时刻，[单日历时间/双日历开始时间，结束时间]，示例：12:00:00
     disabledDate: { // 禁止选中的日期/月
       before: null, // 该日期前不可选
       after: null // 该日期后不可选
