@@ -62,23 +62,23 @@ let AjDataPicker = function (options) {
     },
     // 初始化各种存储值
     initValue () {
-      if (this.option.defaultTime.length) {
+      if (this.option.defaultTime.length && this.utils.checkNull(this.option.defaultTime[0])) {
         let arr = this.option.defaultTime[0].split(':')
         this.startInit.hh = arr[0]
         this.startInit.mm = arr[1]
         this.startInit.ss = arr[2]
       }
-      if (this.option.defaultTime.length > 1) {
+      if (this.option.defaultTime.length > 1 && this.utils.checkNull(this.option.defaultTime[1])) {
         let arr = this.option.defaultTime[1].split(':')
         this.endInit.hh = arr[0]
         this.endInit.mm = arr[1]
         this.endInit.ss = arr[2]
       }
       this.now = this.setTimeObj(new Date())
-      if (this.option.defaultValue.length) {
+      if (this.option.defaultValue.length && this.utils.checkNull(this.option.defaultValue[0])) {
         this._startDate = new Date(this.option.defaultValue[0])
       }
-      if (this.option.defaultValue.length > 1) {
+      if (this.option.defaultValue.length > 1 && this.utils.checkNull(this.option.defaultValue[1])) {
         this._endDate = new Date(this.option.defaultValue[1])
       }
       if (this.option.showType === 'month') {
