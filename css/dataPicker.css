@@ -401,7 +401,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   background-color: #409eff;
 }
 .show-month.is-range .vp-picker-table-month td.is-start div,.show-month.is-range .vp-picker-table-month td.is-end div{
-  background-color: #f2f6fc;
+  background-color: #e9f1fb;
 }
 .show-month .vp-picker-table-month td.is-start.today div span,.show-month .vp-picker-table-month td.is-end.today div span{
   color: #fff;

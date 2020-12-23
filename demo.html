@@ -32,9 +32,7 @@ let setting = {
   id: 'demo1',
   preText: '单日历：',
   preStyle: '',
-  // startDate: '2021-12-09',
-  // startDate: now.getTime(),
-  // endDate: now.getTime(),
+  // defaultValue: ['2021-12-09'],
   defaultValue: [now.getTime()],
   isRange: false,
   showHotkey: false,
@@ -53,11 +51,8 @@ let setting1 = {
   preText: '双日历：',
   preStyle: '',
   // rangeSeparator: '-',
-  // startDate: now.getTime() - 3600 * 1000 * 24,
-  // endDate: now.getTime() + 3600 * 1000 * 24,
-  // startDate: '2020-02-09 05:05:03',
-  // endDate: '2024-3-11 01:01:01',
-  defaultValue: ['2020-02', '2024-3'],
+  // defaultValue: ['2020-02-09', '2024-3-11'],
+  defaultValue: ['2020-02', '2020-02'],
   defaultTime: ['12:00:00', '14:35:35'], // 选中日期后的默认具体时刻，[单日历时间/双日历开始时间，结束时间]，示例：12:00:00
   // disabledDate: {
   //   before: '2020/12/20',
@@ -66,7 +61,7 @@ let setting1 = {
   align: 'center',
   isRange: true,
   showHotkey: false,
-  showType: 'time',
+  showType: 'month',
   callback: {
     dataChange: function (data) {
       console.log('dataChange', data)

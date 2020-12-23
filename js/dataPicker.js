@@ -14,8 +14,6 @@ let arrMonth = [
 ]
 let arr24 = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
 let arr60 = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59']
-// let startInit = {text: '', y: '', m: '', d: '', hh: '00', mm: '00', ss: '00'}
-// let endInit = {text: '', y: '', m: '', d: '', hh: '23', mm: '59', ss: '59'}
 
 let AjDataPicker = function (options) {
   let newObj = {
@@ -24,10 +22,6 @@ let AjDataPicker = function (options) {
     endInit: {text: '', y: '', m: '', d: '', hh: '23', mm: '59', ss: '59'},
     option: {},
     box: {},
-    initData: { // 初始开始/结束时间
-      start: null,
-      end: null
-    },
     now: {}, // 当前时间
     start: {}, // 选择结束的开始/结束时间信息
     end: {},
@@ -82,11 +76,9 @@ let AjDataPicker = function (options) {
       }
       this.now = this.setTimeObj(new Date())
       if (this.option.defaultValue.length) {
-        this.initData.start = new Date(this.option.defaultValue[0])
         this._startDate = new Date(this.option.defaultValue[0])
       }
       if (this.option.defaultValue.length > 1) {
-        this.initData.end = new Date(this.option.defaultValue[1])
         this._endDate = new Date(this.option.defaultValue[1])
       }
       if (this.option.showType === 'month') {
@@ -285,7 +277,7 @@ let AjDataPicker = function (options) {
           this._endM = this.end.m
           this._endDate = new Date(this.replaceDate(this.end.text))
           // 如果开始和结束日期在同一月，右日历自动向后移一月
-          if (this._endY === this._startY && this._endM === this._startM) {
+          if (this.option.showType !== 'month' && this._endY === this._startY && this._endM === this._startM) {
             let sibling = this.getSiblingMonth(this.end.y, this.end.m, true)
             this._endY = sibling.y
             this._endM = sibling.m
