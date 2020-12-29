@@ -415,6 +415,9 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   background-color: #f5f7fa;
   color: #c0c4cc;
 }
+.vp-picker-table-empty-td{
+  cursor:default !important;
+}
 /* vp-picker-time */
 .vp-picker-time{
   position: relative;

@@ -418,7 +418,7 @@ let AjDataPicker = function (options) {
       })
       if (arr.length < 4) {
         for (let i = arr.length; i < 4; i++) {
-          html += '<td></td>'
+          html += '<td class="vp-picker-table-empty-td"></td>'
         }
       }
       html += '</tr>'
@@ -478,7 +478,7 @@ let AjDataPicker = function (options) {
       })
       if (arr.length < 4) {
         for (let i = arr.length; i < 4; i++) {
-          html += '<td></td>'
+          html += '<td class="vp-picker-table-empty-td"></td>'
         }
       }
       html += '</tr>'
@@ -589,6 +589,9 @@ let AjDataPicker = function (options) {
       // 年点击事件
       this.panel.find('.vp-picker-table-year td').unbind('click')
       this.panel.find('.vp-picker-table-year').on('click', 'td', function (e) {
+        if ($(this).hasClass('vp-picker-table-empty-td')) {
+          return
+        }
         let target = $(this).parents('.vp-picker-con')
         let isStart = target.hasClass('start')
         let val = $(this).attr('data-val')
@@ -599,7 +602,7 @@ let AjDataPicker = function (options) {
       // 月点击事件
       this.panel.find('.vp-picker-table-month td').unbind('click')
       this.panel.find('.vp-picker-table-month').on('click', 'td', function (e) {
-        if ($(this).hasClass('disabled')) {
+        if ($(this).hasClass('disabled', 'vp-picker-table-empty-td')) {
           return
         }
         if (vm.option.showType === 'month') {
@@ -771,7 +774,7 @@ let AjDataPicker = function (options) {
     },
     // 显示月表格
     showMonthTable (target) {
-      if (!this.option.showType === 'month') {
+      if (this.option.showType !== 'month') {
         target.find('.vp-picker-con-header-label.year-to-year').show()
       } else {
         target.siblings('.vp-picker-con').find('.vp-picker-mask').hide()
@@ -820,7 +823,7 @@ let AjDataPicker = function (options) {
       } else {
         this._endY = isNext ? parseInt(this._endY) + 1 : parseInt(this._endY) - 1
       }
-      if (!this.option.showType === 'month') {
+      if (this.option.showType !== 'month') {
         this.updateDayTd(target)
       }
       this.updateMonthTd(target)
@@ -1143,10 +1146,18 @@ let AjDataPicker = function (options) {
       // }
     },
     // 赋值
-    $_setData (data) {
-      let arr = data.split(',')
-      this._startDate = new Date(this.replaceDate(arr[0]))
-      this._endDate = arr[1] ? new Date(this.replaceDate(arr[1])) : null
+    $_setData (str) {
+      let arr = []
+      if (str.length) {
+        arr = str.split(',')
+        this._startDate = new Date(this.replaceDate(arr[0]))
+        this._endDate = arr[1] ? new Date(this.replaceDate(arr[1])) : null
+        this.setInputVal(false, true)
+      } else {
+        this._startDate = null
+        this._endDate = null
+        this.setInputVal(true, true)
+      }
       this.setInputVal(false, true)
       if (this.option.callback.setData) {
         let str = arr[1] ? JSON.stringify({start: this.start.text, end: this.end.text}) : this.start.text
@@ -1307,7 +1318,7 @@ let AjDataPicker = function (options) {
     align: 'left', // 输入框中内容的对齐方式
     isRange: '', // 是否双日历
     rangeSeparator: '至', // 选择范围时的分隔符
-    defaultValue: [], // 初始化时默认显示的时间，[单日历时间/双日历开始时间，结束]
+    defaultValue: [], // 初始化时默认显示的日期/月份，[单日历时间/双日历开始时间，结束]
     defaultTime: [], // 选中日期后的默认具体时刻，[单日历时间/双日历开始时间，结束时间]，示例：12:00:00
     disabledDate: { // 禁止选中的日期/月
       before: null, // 该日期前不可选
