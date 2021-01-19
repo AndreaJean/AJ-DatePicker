@@ -1158,7 +1158,6 @@ let AjDataPicker = function (options) {
         this._endDate = null
         this.setInputVal(true, true)
       }
-      this.setInputVal(false, true)
       if (this.option.callback.setData) {
         let str = arr[1] ? JSON.stringify({start: this.start.text, end: this.end.text}) : this.start.text
         this.option.callback.setData(str)
