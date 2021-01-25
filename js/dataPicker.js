@@ -56,7 +56,12 @@ let AjDataPicker = function (options) {
       this.bindHeaderEvent()
 
       if (this.option.callback.dataOver) {
-        let str = this.option.isRange ? JSON.stringify({start: this.start.text, end: this.end.text}) : this.start.text
+        let str = ''
+        if (this.option.isRange) {
+          str = this.start.text.length || this.end.text.length ? JSON.stringify({start: this.start.text, end: this.end.text}) : ''
+        } else {
+          str = this.start.text.length ? this.start.text : ''
+        }
         this.option.callback.dataOver(str)
       }
     },
